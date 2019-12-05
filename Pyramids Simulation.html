@@ -1,0 +1,133 @@
+<html>
+	<head>
+		<title>Pyramids Simulation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel = "icon" type = "image/png" href = "icon.png">
+        <style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+                font-family: Arial, Helvetica, sans-serif;
+			}
+            #myModal {
+                display: none;
+                position: fixed;
+                z-index: 1;
+                padding-top: 13em;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+            }
+            #modal-content {
+                background-color: #fefefe;
+                margin: auto;
+                padding: 2%;
+                border: 1px solid #888;
+                border-radius: 25px;
+                width: 40%;
+                text-align: center;
+            }
+            #closebtn {
+                border-radius: 25px;
+                width: 8em;
+                height: 3em;
+                background-color:antiquewhite ;
+            }
+		</style>
+	</head>
+	<body>
+		<script src="build/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+        <div id="myModal">
+            <div id="modal-content">
+                <p><b>
+                    Welcome to Pyramids Simulation V1<br><br><br>
+                    Controls:<br><br>
+                    Mouse scroll to zoom in and out.<br><br>
+                    Mouse left click hold + mouse movement to free rotate.<br><br>
+                    <!--Keyboard arrows to move freely as desired.<br><br>-->
+                    <br>
+                    Hope you enjoy it.
+                    <br><br>
+                </b></p>
+                <button id="closebtn"><b>Proceed</b></button>
+            </div>
+        </div>
+        
+        <script>
+            window.onload = function() {
+                document.getElementById("myModal").style.display = "block";
+            }
+            document.getElementById("closebtn").onclick = function() {
+                document.getElementById("myModal").style.display = "none";
+            }
+			var camera, scene, renderer;
+			init();
+			animate();
+			function init() {
+                scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth/window.innerHeight, 1, 10000 );
+                camera.position.set( -450, 30, 500 );
+				var control = new THREE.OrbitControls( camera );
+                control.maxPolarAngle = Math.PI/2;
+                control.maxDistance = 990;
+                control.enableKeys = false;
+                
+				var sphereGeo = new THREE.SphereBufferGeometry( 1000, 32, 32 );
+				var skytexture = new THREE.TextureLoader().load( 'textures/sky.jpg' );
+				var skymaterial = new THREE.MeshBasicMaterial( { map: skytexture } );
+				var containerMesh = new THREE.Mesh( sphereGeo, skymaterial );
+                skymaterial.side = THREE.DoubleSide;
+				containerMesh.position.x = 0;
+				containerMesh.position.y = 0;
+				containerMesh.position.z = 0;
+				scene.add( containerMesh );
+                
+                var planeGeo = new THREE.BoxBufferGeometry( 2000, 0, 2000 );
+                var sandtexture = new THREE.TextureLoader().load( 'textures/sand.jpg' );
+                var sandmaterial = new THREE.MeshBasicMaterial( { map: sandtexture } );
+                var planeMesh = new THREE.Mesh( planeGeo, sandmaterial );
+                sandmaterial.side = THREE.DoubleSide;
+                planeMesh.position.y = -110;
+                containerMesh.add( planeMesh );
+                
+                var texture = new THREE.TextureLoader().load( 'textures/pyramids.jpg' );
+                var material = new THREE.MeshBasicMaterial( { map: texture } );
+                material.side = THREE.DoubleSide;
+
+                /* The Biggest Pyramid */
+                var firstPyramidGeo = new THREE.CylinderBufferGeometry( 0, 210, 210, 4 );
+                var firstPyramidMesh = new THREE.Mesh( firstPyramidGeo, material );
+                firstPyramidMesh.position.y -= 5 ;
+                containerMesh.add( firstPyramidMesh );
+
+                /* The Smallest Pyramid */
+                var secondPyramidGeo = new THREE.CylinderBufferGeometry( 0, 120, 120, 4 );
+                var secondPyramidMesh = new THREE.Mesh( secondPyramidGeo, material );
+                secondPyramidMesh.position.x += 280 ;
+                secondPyramidMesh.position.y -= 51 ;
+                secondPyramidMesh.position.z += 100;
+                containerMesh.add( secondPyramidMesh );
+
+                /* The Middle Pyramid */
+                var thirdPyramidGeo = new THREE.CylinderBufferGeometry( 0, 140, 140, 4 );
+                var thirdPyramidMesh = new THREE.Mesh( thirdPyramidGeo, material );
+                thirdPyramidMesh.position.x -= 340 ;
+                thirdPyramidMesh.position.y -= 40 ;
+                thirdPyramidMesh.position.z -= 80;
+                containerMesh.add( thirdPyramidMesh );
+                
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+            }
+            function animate() {
+				renderer.render( scene, camera );
+				requestAnimationFrame( animate );
+			}
+		</script>
+	</body>
+</html>
