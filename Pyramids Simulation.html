@@ -4,65 +4,71 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel = "icon" type = "image/png" href = "icon.png">
-        <style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-                font-family: Arial, Helvetica, sans-serif;
-			}
-            #myModal {
-                display: none;
-                position: fixed;
-                z-index: 1;
-                padding-top: 13em;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.7);
-            }
-            #modal-content {
-                background-color: #fefefe;
-                margin: auto;
-                padding: 2%;
-                border: 1px solid #888;
-                border-radius: 25px;
-                width: 40%;
-                text-align: center;
-            }
-            #closebtn {
-                border-radius: 25px;
-                width: 8em;
-                height: 3em;
-                background-color:antiquewhite ;
-            }
-		</style>
+        <link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
 		<script src="build/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
         <div id="myModal">
             <div id="modal-content">
+                <img src="icon.png" width="40%" height="20%">
                 <p><b>
-                    Welcome to Pyramids Simulation V1<br><br><br>
-                    Controls:<br><br>
-                    Mouse scroll to zoom in and out.<br><br>
-                    Mouse left click hold + mouse movement to free rotate.<br><br>
-                    <!--Keyboard arrows to move freely as desired.<br><br>-->
-                    <br>
-                    Hope you enjoy it.
+                    Welcome to Pyramids Simulation V2<br><br><hr><br>
+                    **Brief about the pyramids**<br><br><br>
+                    The Egyptian pyramids are ancient pyramid-shaped masonry structures located in Egypt<br><br>
+                    They were built as tombs for the country's pharaohs<br><br>
+                    The Pyramid of Khufu at Giza is the largest Egyptian pyramid<br><br>
+                    It is the only one of the Seven Wonders of the Ancient World still in existence<br><br>
+                    The middle sized is named Khafre<br><br>
+                    The smalest sized is named Menkaure<br><br>
+                    <hr><br>**Controls**<br><br><br>
+                    Mouse scroll to zoom in and out<br><br>
+                    Mouse left click hold + mouse movement to free rotate<br><br>
+                    <hr><br>
+                    Hope you enjoy it
                     <br><br>
                 </b></p>
-                <button id="closebtn"><b>Proceed</b></button>
+                <button id="closebtn" style="margin-left: 7.5vw;" onclick="modalclose()"><b>Proceed</b></button><button id="chngbtn"><b>Changelog</b></button>
+            </div>
+            <div id="modal2-content">
+                <p><b>
+                    **CHANGELOG**<br>
+                    <hr><br>**V1**<br><br><br>
+                    Added sphere<br><br>
+                    Added plane<br><br>
+                    Added cylinders<br><br>
+                    Edited cylinders to shape pyramids<br><br>
+                    Added camera<br><br>
+                    Edited camera limits<br><br>
+                    Added textures<br><br>
+                    Edited textures to be doublesided<br><br>
+                    Added the welcome message and controls<br><br>
+                    <hr><br>**V2**<br><br><br>
+                    Added brief about the pyramids<br><br>
+                    Added changelog<br><br>
+                    <hr><br>
+                </b></p>
+                <button id="bckbtn"><b>Back</b></button><button id="closebtn" style="margin-right: 7vw;" onclick="modalclose()"><b>Proceed</b></button>
             </div>
         </div>
-        
         <script>
             window.onload = function() {
                 document.getElementById("myModal").style.display = "block";
             }
-            document.getElementById("closebtn").onclick = function() {
-                document.getElementById("myModal").style.display = "none";
+            document.getElementById("chngbtn").onclick = function() {
+                document.getElementById("modal-content").style.display = "none";
+                document.getElementById("modal2-content").style.display = "block";
             }
+            document.getElementById("bckbtn").onclick = function() {
+                document.getElementById("modal-content").style.display = "block";
+                document.getElementById("modal2-content").style.display = "none";
+            }
+            function modalclose(){
+                document.getElementById("modal-content").style.display = "none";
+                document.getElementById("modal2-content").style.display = "none";
+                document.getElementById("myModal").style.display = "none";
+            };
+            
 			var camera, scene, renderer;
 			init();
 			animate();
