@@ -65,22 +65,22 @@
                 document.getElementById("modal2-content").style.display = "none";
             }
             function modalclose(){
+                control = new THREE.OrbitControls( camera );
+                control.maxPolarAngle = Math.PI/2;
+                control.maxDistance = 990;
+                control.enableKeys = false;
                 document.getElementById("modal-content").style.display = "none";
                 document.getElementById("modal2-content").style.display = "none";
                 document.getElementById("myModal").style.display = "none";
             };
-
-            var camera, scene, renderer, light;
+            
+            var camera, scene, renderer, light, control;
             init();
             animate();
             function init() {
                 scene = new THREE.Scene();
                 camera = new THREE.PerspectiveCamera( 70, window.innerWidth/window.innerHeight, 1, 10000 );
                 camera.position.set( -450, 30, 500);
-                var control = new THREE.OrbitControls( camera );
-                control.maxPolarAngle = Math.PI/2;
-                control.maxDistance = 990;
-                control.enableKeys = false;
 
                 var sphereGeo = new THREE.SphereBufferGeometry( 1000, 32, 32 );
                 var skytexture = new THREE.TextureLoader().load( 'textures/sky.jpg' );
@@ -132,11 +132,10 @@
                 containerMesh.add( thirdPyramidMesh );
 
 
-
                 light = new THREE.DirectionalLight(0xffffff, 1.0);
                 light.castShadow = true;  // allows the light to cast shadows
                 light.shadowDarkness = 0.8;
-                light.shadowCameraNear = 1; // Note: It is VITAL to set the camera camera properties!
+                light.shadowCameraNear = 1; // Note: It is VITAL to set the camera properties!
                 light.shadowCameraFar = 10000;
                 light.shadowCameraLeft = -200;
                 light.shadowCameraBottom = -250;
