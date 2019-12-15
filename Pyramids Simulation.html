@@ -9,7 +9,9 @@
     <body>
         <script src="build/three.js"></script>
         <script src="js/controls/OrbitControls.js"></script>
-<!--
+        <script src="js/controls/dat.gui.min.js"></script>
+        <script src="js/OBJLoader.js"></script>
+
         <div id="myModal">
             <div id="modal-content">
                 <img src="icon.png" width="40%" height="20%">
@@ -29,8 +31,8 @@
                     Hope you enjoy it
                     <br><br>
                     </b></p>
-                <button id="closebtn" style="margin-left: 7.5vw;" onclick="modalclose()">+
-                <b>Proceed</b></button><button id="chngbtn"><b>Changelog</b></button>
+                <button id="closebtn" style="margin-left: 7.5vw;" onclick="modalclose()">
+                    <b>Proceed</b></button><button id="chngbtn"><b>Changelog</b></button>
             </div>
             <div id="modal2-content">
                 <p><b>
@@ -53,9 +55,8 @@
                 <button id="bckbtn"><b>Back</b></button><button id="closebtn" style="margin-right: 7vw;" onclick="modalclose()"><b>Proceed</b></button>
             </div>
         </div>
--->
-        <script>
 
+        <script>
             window.onload = function() {
                 document.getElementById("myModal").style.display = "block";
             }
@@ -68,33 +69,36 @@
                 document.getElementById("modal2-content").style.display = "none";
             }
             function modalclose(){
-                control = new THREE.OrbitControls( camera );
-                control.maxPolarAngle = Math.PI/2;
-                control.maxDistance = 990;
+
+                //                control.maxPolarAngle = Math.PI/2;
+                //                control.maxDistance = 990;
                 control.enableKeys = false;
                 document.getElementById("modal-content").style.display = "none";
                 document.getElementById("modal2-content").style.display = "none";
                 document.getElementById("myModal").style.display = "none";
             };
-            
-            var camera, scene, renderer, light, control;
+
+            var camera, scene, renderer, light ,light2, control ;
+            var l = false;
+            var lightToggle = 0;
+            var loaded = false;
+            var x = 0.1;
             init();
             animate();
             function init() {
                 scene = new THREE.Scene();
                 camera = new THREE.PerspectiveCamera( 70, window.innerWidth/window.innerHeight, 1, 10000 );
                 camera.position.set( -450, 30, 500);
-
+                control = new THREE.OrbitControls( camera ); 
                 var sphereGeo = new THREE.SphereBufferGeometry( 1000, 32, 32 );
                 var skytexture = new THREE.TextureLoader().load( 'textures/sky.jpg' );
-                var skymaterial = new THREE.MeshBasicMaterial( { map: skytexture } );
+                var skymaterial = new THREE.MeshPhongMaterial( { map: skytexture } );
                 var containerMesh = new THREE.Mesh( sphereGeo, skymaterial );
-                skymaterial.side = THREE.DoubleSide;
+                skymaterial.side = THREE.BackSide;
                 containerMesh.position.x = 0;
                 containerMesh.position.y = 0;
                 containerMesh.position.z = 0;
                 scene.add( containerMesh );
-
                 var planeGeo = new THREE.BoxBufferGeometry( 2000, 0, 2000 );
                 var sandtexture = new THREE.TextureLoader().load( 'textures/sand.jpg' );
                 var sandmaterial = new THREE.MeshPhongMaterial( { map: sandtexture } );
@@ -102,90 +106,206 @@
                 sandmaterial.side = THREE.DoubleSide;
                 planeMesh.receiveShadow = true; 
                 planeMesh.position.y = -107;
-                scene.add( planeMesh );
-
+                containerMesh.add( planeMesh );
                 var texture = new THREE.TextureLoader().load( 'textures/pyramids.jpg' );
                 var material = new THREE.MeshPhongMaterial( { map: texture } );
-//                material.side = THREE.DoubleSide;
 
                 /* The Biggest Pyramid */
                 var firstPyramidGeo = new THREE.CylinderBufferGeometry( 0, 210, 210, 4 );
                 var firstPyramidMesh = new THREE.Mesh( firstPyramidGeo, material );
-                //                firstPyramidMesh.rotation.y = 150;
                 firstPyramidMesh.castShadow = true;
                 firstPyramidMesh.receiveShadow = true; 
                 firstPyramidMesh.position.y = -1 ;
                 containerMesh.add( firstPyramidMesh );
-
                 /* The Smallest Pyramid */
-                var secondPyramidGeo = new THREE.CylinderBufferGeometry( 0, 150, 150, 4 );
+                var secondPyramidGeo = new THREE.CylinderBufferGeometry( 0, 130, 130, 4 );
                 var secondPyramidMesh = new THREE.Mesh( secondPyramidGeo, material );
                 secondPyramidMesh.position.x += 280 ;
-                secondPyramidMesh.position.y -= 51 ;
+                secondPyramidMesh.position.y -= 41 ;
                 secondPyramidMesh.position.z += 120;
                 secondPyramidMesh.castShadow = true;
                 secondPyramidMesh.receiveShadow = true; 
                 containerMesh.add( secondPyramidMesh );
-
                 /* The Middle Pyramid */
-                var thirdPyramidGeo = new THREE.CylinderBufferGeometry( 0, 180, 180, 4 );
+                var thirdPyramidGeo = new THREE.CylinderBufferGeometry( 0, 150, 150, 4 );
                 var thirdPyramidMesh = new THREE.Mesh( thirdPyramidGeo, material );
                 thirdPyramidMesh.position.x -= 320 ;
-                thirdPyramidMesh.position.y -= 40 ;
+                thirdPyramidMesh.position.y -= 32 ;
                 thirdPyramidMesh.position.z -= 80;
                 thirdPyramidMesh.castShadow = true;
-                thirdPyramidMesh.receiveShadow = true; //default
+                thirdPyramidMesh.receiveShadow = true;
                 containerMesh.add( thirdPyramidMesh );
 
-//                
-//                light = new THREE.DirectionalLight(0xffffff, 1.0);
-//                light.castShadow = true;  // allows the light to cast shadows
-//                light.shadow.camera.near = 1; // Note: It is VITAL to set the camera properties!
-//                light.shadow.camera.far = 10000;
-//                light.shadow.camera.left = -200;
-//                light.shadow.camera.button = -250;
-//                light.shadow.camera.right = 200;
-//                light.shadow.camera.top = 400;
-//                light.shadow.mapSize.width = 2048;
-//                light.shadow.mapSize.height = 2048;
-//                light.add( new THREE.Mesh(
-//                    new THREE.SphereBufferGeometry( 50, 20 , 20 ),
-//                    new THREE.MeshBasicMaterial({ color: 0xcccccc })
-//                ));
-//                light.position.set(650,650,350);
-//                firstLight = new THREE.Object3D();
-//                firstLight.add(light);
-//                scene.add(firstLight);
+                var options = {
+                    'Reset Camera': function() {
+                        camera.position.set( -450, 30, 500);
+                        control = new THREE.OrbitControls( camera );
+                    },
+                    'Toggle Light': function() {
+                        lightToggle = lightToggle == 0 ? 1 : 0;
+                    }
+                };
+
+                var gui = new dat.GUI();
+
+                gui.add(options, 'Reset Camera');
+                gui.add(options, 'Toggle Light');
+                var manager = new THREE.LoadingManager();
+                manager.onLoad = function(){ loaded = true; }
+
+                var textureLoader = new THREE.TextureLoader(manager);
+
+                var objLoader = new THREE.OBJLoader();
+
+                var camelSkin1 = textureLoader.load( 'textures/camel-skin1.jpg' );
+                var camelmaterial = new THREE.MeshPhongMaterial( { map: camelSkin1 } );
+                objLoader.load('models/camel.obj',function(c1){
+                    c1.traverse(function(node){
+                        if (node.isMesh) {node.material=camelmaterial};
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    });
+                    c1.position.x += 180 ;
+                    c1.position.y -= 105 ;
+                    c1.position.z += 200;
+                    c1.rotation.y -= THREE.Math.degToRad(115);
+                    c1.scale.x += 23;
+                    c1.scale.y += 23;
+                    c1.scale.z += 23;
+                    containerMesh.add( c1 );
+                });
+
+
+
+                var camelSkin2 = textureLoader.load( 'textures/camelskin.jpg' );
+                var camelmaterial2 = new THREE.MeshPhongMaterial( { map: camelSkin2 } );
+                objLoader.load('models/camel2.obj',function(c2){
+
+                    c2.traverse(function(node){
+                        if (node.isMesh) {node.material=camelmaterial2};
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    });
+                    c2.position.x -= 380 ;
+                    c2.position.y -= 107 ;
+                    c2.position.z += 130;
+                    c2.rotation.y = THREE.Math.degToRad(50);
+                    c2.scale.x += 10;
+                    c2.scale.y += 10;
+                    c2.scale.z += 10;
+                    containerMesh.add( c2 );
+                });
+
+                var horseSkin = textureLoader.load( 'textures/horseskin.jpg' );
+                var horsematerial = new THREE.MeshPhongMaterial( { map: horseSkin } );
+                objLoader.load('models/standing-horse.obj',function(h1){
+                    h1.traverse(function(node){
+                        if (node.isMesh) {node.material=horsematerial};
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    });                      
+                    h1.position.x -= 250 ;
+                    h1.position.y -= 115 ;
+                    h1.position.z += 400;
+                    h1.rotation.y -= THREE.Math.degToRad(87);
+                    h1.scale.x += 11;
+                    h1.scale.y += 11;
+                    h1.scale.z += 11;
+                    containerMesh.add( h1 );
+                });
+
+
+
+                var sphinxtexture = textureLoader.load( 'textures/sphinx.jpg' );
+                var sphinxmaterial = new THREE.MeshPhongMaterial( { map: sphinxtexture } );
+                objLoader.load('models/sphinx.obj',function(object){
+
+                    object.traverse(function(node){
+                        if (node.isMesh) {node.material=horsematerial};
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    });                      
+                    object.position.x = -550 ;
+                    object.position.y = -110 ;
+                    object.position.z = -220 ;
+
+                    object.scale.x = 0.055;
+                    object.scale.y = 0.055;
+                    object.scale.z = 0.055;
+                    object.rotation.x = THREE.Math.degToRad(270);
+                    object.rotation.z =THREE.Math.degToRad(-45);
+                    containerMesh.add( object );
+
+                });
+
+
+                light2 = new THREE.PointLight( 0xffffff, 1, 10000 );
+                light2.castShadow = true;
+                light2.position.set( 300, -650, 350 );
+                containerMesh.add( light2 );
 
                 light = new THREE.DirectionalLight(0xffffff, 1.0);
-                light.castShadow = true;  // allows the light to cast shadows
-                light.shadowDarkness = 0.8;
-                light.shadowCameraNear = 1; // Note: It is VITAL to set the camera properties!
+                light.castShadow = true;
+                light.shadowCameraNear = 1;
                 light.shadowCameraFar = 10000;
-                light.shadowCameraLeft = -250;
-                light.shadowCameraBottom = -250;
-                light.shadowCameraRight = 200;
-                light.shadowCameraTop = 400;
+                light.shadowCameraLeft = -500;
+                light.shadowCameraBottom = -500;
+                light.shadowCameraRight = 300;
+                light.shadowCameraTop = 600;
                 light.shadowMapWidth = 2048;
                 light.shadowMapHeight = 2048;
-                light.add( new THREE.Mesh(
-                    new THREE.SphereBufferGeometry( 50, 20 , 20 ),
-                    new THREE.MeshBasicMaterial({ color: 0xcccccc })
-                ));
-                light.position.set(650,650,350);
+                light.position.set(670,670,370);
                 firstLight = new THREE.Object3D();
                 firstLight.add(light);
-                scene.add(firstLight);
-
+                containerMesh.add(firstLight);
 
                 renderer = new THREE.WebGLRenderer();
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
                 renderer.shadowMapEnabled = true;
                 document.body.appendChild( renderer.domElement );
-            }
+            }  
             function animate() {
-//                light.position.z +=3;
+
+                if (loaded == true)
+                {
+                    if (scene.children[0].children[6].position.z <= 550 && scene.children[0].children[6].position.z >= 0)
+                    {
+
+                        scene.children[0].children[6].position.z += x;
+                        scene.children[0].children[6].position.x += x;
+                    }                 
+                    else if (scene.children[0].children[6].position.z >= 550)
+                    {
+                        x = -x;
+                        scene.children[0].children[6].rotation.y =THREE.Math.degToRad(225) ;
+                        scene.children[0].children[6].position.z += x;
+                        scene.children[0].children[6].position.x += x;
+                    }
+                    else 
+                    {
+                        x = -x;
+                        scene.children[0].children[6].rotation.y =THREE.Math.degToRad(50) ;
+                        scene.children[0].children[6].position.z += x;
+                        scene.children[0].children[6].position.x += x;
+                    }
+                }
+                if (light2.intensity <= 1 && l == false)
+                {
+                    light2.intensity -= 0.004 * lightToggle;
+                    light.intensity -= 0.0043 * lightToggle;
+                    light.position.y += 3 * lightToggle;
+                    if (light2.intensity <= 0.36){ 
+                        l = true; 
+                    }
+                }
+                if (light2.intensity <= 1 && l == true)
+                {   
+                    light2.intensity += 0.004 * lightToggle;
+                    light.intensity += 0.0043 * lightToggle;
+                    light.position.y -= 2 * lightToggle;
+                    if (light2.intensity >= 1){ l = false; }
+                }
                 renderer.render( scene, camera );
                 requestAnimationFrame( animate );
             }
