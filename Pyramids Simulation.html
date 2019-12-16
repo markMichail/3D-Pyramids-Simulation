@@ -54,6 +54,9 @@
                     Added the objects (2 camels & a horse)<br><br>
                     Added movement to a camel<br><br>
                     Changed the sky texture<br><br>
+                    Added camera reset button<br><br>
+                    Added day control button<br><br>
+                    Added the moon<br><br>
                     <hr><br>
                     </b></p>
                 <button id="bckbtn"><b>Back</b></button><button id="closebtn" style="margin-right: 7vw;" onclick="modalclose()"><b>Proceed</b></button>
@@ -277,11 +280,14 @@
                     new THREE.MeshBasicMaterial({ color: 0xcccccc })
                 ));
                 containerMesh.add( light3 );
-
-
+                
+                
+                //creating a pivot
                 pivot = new THREE.Group();
-                pivot.position.set( 0.0, 0.0, 0 ); // MOVE THE PIVOT BACK TO WORLD ORIGN
-                containerMesh.add( pivot ); // THIS ADDS THE PIVOT TO THE CENTRE OF THE GEOMOETRY, WHICH WAS THEN ADDING MESH2 IN THE WRONG PLACE
+                //moving the pivot back to world origin
+                pivot.position.set( 0.0, 0.0, 0 );
+                //adding the pivot to the center of the sphere
+                containerMesh.add( pivot );
                 pivot.add( light );
                 pivot.add( light3 );
 
