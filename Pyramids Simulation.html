@@ -98,6 +98,7 @@
                 scene = new THREE.Scene();
                 camera = new THREE.PerspectiveCamera( 70, window.innerWidth/window.innerHeight, 1, 10000 );
                 camera.position.set( -600, 70, 500);
+
                 //adding the sphere(sky) and setting its texture
                 var sphereGeo = new THREE.SphereBufferGeometry( 1000, 32, 32 );
                 var skytexture = new THREE.TextureLoader().load( 'textures/sky.jpg' );
@@ -108,7 +109,7 @@
                 containerMesh.position.y = 0;
                 containerMesh.position.z = 0;
                 scene.add( containerMesh );
-                
+
                 //adding the plane(floor) and setting its texture
                 var planeGeo = new THREE.BoxBufferGeometry( 2000, 0, 2000 );
                 var sandtexture = new THREE.TextureLoader().load( 'textures/sand.jpg' );
@@ -118,7 +119,7 @@
                 planeMesh.receiveShadow = true; 
                 planeMesh.position.y = -107;
                 containerMesh.add( planeMesh );
-                
+
                 //applying texture for the pyramids
                 var texture = new THREE.TextureLoader().load( 'textures/pyramids.jpg' );
                 var material = new THREE.MeshPhongMaterial( { map: texture } ); //phong to receive/cast shadows
@@ -130,7 +131,7 @@
                 firstPyramidMesh.receiveShadow = true; 
                 firstPyramidMesh.position.y = -1 ;
                 containerMesh.add( firstPyramidMesh );
-                
+
                 /* The Smallest Pyramid */
                 var secondPyramidGeo = new THREE.CylinderBufferGeometry( 0, 130, 130, 4 );
                 var secondPyramidMesh = new THREE.Mesh( secondPyramidGeo, material );
@@ -140,7 +141,7 @@
                 secondPyramidMesh.castShadow = true;
                 secondPyramidMesh.receiveShadow = true; 
                 containerMesh.add( secondPyramidMesh );
-                
+
                 /* The Middle Pyramid */
                 var thirdPyramidGeo = new THREE.CylinderBufferGeometry( 0, 150, 150, 4 );
                 var thirdPyramidMesh = new THREE.Mesh( thirdPyramidGeo, material );
@@ -151,7 +152,7 @@
                 thirdPyramidMesh.receiveShadow = true;
                 containerMesh.add( thirdPyramidMesh );
 
-                //creating the upper control box
+                //creating the upper control box options
                 var options = {
                     'Reset Camera': function() {
                         camera.position.set( -600, 70, 500);
@@ -166,11 +167,11 @@
                 var gui = new dat.GUI();
                 gui.add(options, 'Reset Camera');
                 gui.add(options, 'Toggle Light');
-                
+
                 //adding manager to run functions when scene is fully loaded
                 var manager = new THREE.LoadingManager();
                 manager.onLoad = function(){ loaded = true; }
-                
+
                 //adding the objects and textures loaders
                 var textureLoader = new THREE.TextureLoader( manager );
                 var objLoader = new THREE.OBJLoader();
@@ -194,7 +195,7 @@
                     object.scale.z = 0.055;
                     containerMesh.add( object );
                 });
-                
+
                 //adding the moving camel
                 var camelSkin1 = textureLoader.load( 'textures/camel1.jpg' );
                 var camelmaterial = new THREE.MeshPhongMaterial( { map: camelSkin1 } ); //phong to receive/cast shadows
@@ -251,9 +252,9 @@
                     h1.scale.z += 11;
                     containerMesh.add( h1 );
                 });
-                
+
                 //adding the first light to cast shadows
-                light = new THREE.DirectionalLight(0xffffff, 1.0);
+                light = new THREE.DirectionalLight(0xffffff, 0.8);
                 light.castShadow = true;
                 light.shadow.camera.near = 1;
                 light.shadow.camera.far = 10000;
@@ -263,16 +264,24 @@
                 light.shadow.camera.top = 600;
                 light.shadow.mapSize.width = 2048;
                 light.shadow.mapSize.height = 2048;
-                light.position.set(670,670,370);
-                firstLight = new THREE.Object3D();
-                firstLight.add( light );
-                containerMesh.add( firstLight );
-                
+                light.position.set(670,670,670);
+                containerMesh.add( light );
+
+
+                pivot = new THREE.Group();
+                pivot.position.set( 0.0, 0.0, 0 ); // MOVE THE PIVOT BACK TO WORLD ORIGN
+                containerMesh.add( pivot ); // THIS ADDS THE PIVOT TO THE CENTRE OF THE GEOMOETRY, WHICH WAS THEN ADDING MESH2 IN THE WRONG PLACE
+                pivot.add( light );
+
                 //adding the second light to light up everything
-                light2 = new THREE.PointLight( 0xffffff, 1, 10000 );
+                light2 = new THREE.PointLight( 0xffffff, 1);
                 light2.castShadow = true;
-                light2.position.set( 300, -650, 350 );
+                light2.position.set( 0, -900, 0 );
                 containerMesh.add( light2 );
+
+
+                light2.layers.set(1);
+                containerMesh.layers.set(1);
 
                 //setting the renderer
                 renderer = new THREE.WebGLRenderer();
@@ -302,21 +311,32 @@
                     }
                 }
                 //making it night
-                if (light2.intensity <= 1 && lightBool == false) {
-                    light2.intensity -= 0.004 * lightVal;
-                    light.intensity -= 0.0043 * lightVal;
-                    light.position.y += 2 * lightVal;
-                    if (light2.intensity <= 0.36){ lightBool = true; }
+                if (lightBool == false) {
+                    light2.intensity -= 0.0035 * lightVal;
+                    light.intensity -= 0.003 * lightVal;
+                    pivot.rotation.z += 0.008 * lightVal;
+                    if (light2.intensity <= 0){ 
+                        lightBool = true;
+                        light2.intensity = -1.7;
+                        light.intensity = -0.7;
+                    }
                 }
                 //making it day
-                if (light2.intensity <= 1 && lightBool == true) {   
-                    light2.intensity += 0.004 * lightVal;
-                    light.intensity += 0.0043 * lightVal;
-                    light.position.y -= 2 * lightVal;
-                    if (light2.intensity >= 1){ lightBool = false; }
+                if (lightBool == true) {   
+                    light2.intensity += 0.0055 * lightVal;
+                    light.intensity += 0.003 * lightVal;
+                    pivot.rotation.z += 0.008 * lightVal;
+                    if (light2.intensity >= 1){ 
+                        lightBool = false; 
+                    }
                 }
                 
-                renderer.render( scene, camera );
+                camera.layers.set(0);
+                renderer.render(scene, camera);
+                renderer.autoClear = false;
+                camera.layers.set(1);
+                renderer.render(scene, camera);
+                
                 requestAnimationFrame( animate );
             }
         </script>

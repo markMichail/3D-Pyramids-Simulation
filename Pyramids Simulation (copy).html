@@ -1,0 +1,252 @@
+<html>
+    <head>
+        <title>Pyramids Simulation</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel = "icon" type = "image/png" href = "icon.png">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <script src="build/three.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/controls/dat.gui.min.js"></script>
+
+        <div id="myModal">
+            <div id="modal-content">
+                <img src="icon.png" width="40%" height="20%">
+                <p><b>
+                    Welcome to Pyramids Simulation V2<br><br><hr><br>
+                    **Brief about the pyramids**<br><br><br>
+                    The Egyptian pyramids are ancient pyramid-shaped masonry structures located in Egypt<br><br>
+                    They were built as tombs for the country's pharaohs<br><br>
+                    The Pyramid of Khufu at Giza is the largest Egyptian pyramid<br><br>
+                    It is the only one of the Seven Wonders of the Ancient World still in existence<br><br>
+                    The middle sized is named Khafre<br><br>
+                    The smalest sized is named Menkaure<br><br>
+                    <hr><br>**Controls**<br><br><br>
+                    Mouse scroll to zoom in and out<br><br>
+                    Mouse left click hold + mouse movement to free rotate<br><br>
+                    <hr><br>
+                    Hope you enjoy it
+                    <br><br>
+                    </b></p>
+                <button id="closebtn" style="margin-left: 7.5vw;" onclick="modalclose()">
+                    <b>Proceed</b></button><button id="chngbtn"><b>Changelog</b></button>
+            </div>
+            <div id="modal2-content">
+                <p><b>
+                    **CHANGELOG**<br>
+                    <hr><br>**V1**<br><br><br>
+                    Added sphere<br><br>
+                    Added plane<br><br>
+                    Added cylinders<br><br>
+                    Edited cylinders to shape pyramids<br><br>
+                    Added camera<br><br>
+                    Edited camera limits<br><br>
+                    Added textures<br><br>
+                    Added the welcome message and controls<br><br>
+                    <hr><br>**V2**<br><br><br>
+                    Added brief about the pyramids<br><br>
+                    Added changelog<br><br>
+                    Added the sun & shadows<br><br>
+                    <hr><br>
+                    </b></p>
+                <button id="bckbtn"><b>Back</b></button><button id="closebtn" style="margin-right: 7vw;" onclick="modalclose()"><b>Proceed</b></button>
+            </div>
+        </div>
+        <script>
+            window.onload = function() {
+                document.getElementById("myModal").style.display = "block";
+            }
+            document.getElementById("chngbtn").onclick = function() {
+                document.getElementById("modal-content").style.display = "none";
+                document.getElementById("modal2-content").style.display = "block";
+            }
+            document.getElementById("bckbtn").onclick = function() {
+                document.getElementById("modal-content").style.display = "block";
+                document.getElementById("modal2-content").style.display = "none";
+            }
+            function modalclose(){
+                control = new THREE.OrbitControls( camera ); 
+                control.maxPolarAngle = Math.PI/2;
+                control.maxDistance = 990;
+                control.enableKeys = false;
+                document.getElementById("modal-content").style.display = "none";
+                document.getElementById("modal2-content").style.display = "none";
+                document.getElementById("myModal").style.display = "none";
+            };
+
+            var camera, scene, renderer, light ,light2, control;
+            var l = false;
+            var lightToggle = 0;
+            init();
+            animate();
+            function init() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera( 70, window.innerWidth/window.innerHeight, 1, 10000 );
+                camera.position.set( -450, 30, 500);
+                var sphereGeo = new THREE.SphereBufferGeometry( 1000, 32, 32 );
+                var skytexture = new THREE.TextureLoader().load( 'textures/sky.jpg' );
+                var skymaterial = new THREE.MeshPhongMaterial( { map: skytexture } );
+                var containerMesh = new THREE.Mesh( sphereGeo, skymaterial );
+                skymaterial.side = THREE.BackSide;
+                containerMesh.position.x = 0;
+                containerMesh.position.y = 0;
+                containerMesh.position.z = 0;
+                scene.add( containerMesh );
+                var planeGeo = new THREE.BoxBufferGeometry( 2000, 0, 2000 );
+                var sandtexture = new THREE.TextureLoader().load( 'textures/sand.jpg' );
+                var sandmaterial = new THREE.MeshPhongMaterial( { map: sandtexture } );
+                var planeMesh = new THREE.Mesh( planeGeo, sandmaterial );
+                sandmaterial.side = THREE.DoubleSide;
+                planeMesh.receiveShadow = true; 
+                planeMesh.position.y = -107;
+                scene.add( planeMesh );
+                var texture = new THREE.TextureLoader().load( 'textures/pyramids.jpg' );
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+
+                /* The Biggest Pyramid */
+                var firstPyramidGeo = new THREE.CylinderBufferGeometry( 0, 210, 210, 4 );
+                var firstPyramidMesh = new THREE.Mesh( firstPyramidGeo, material );
+                firstPyramidMesh.castShadow = true;
+                firstPyramidMesh.receiveShadow = true; 
+                firstPyramidMesh.position.y = -1 ;
+                containerMesh.add( firstPyramidMesh );
+                /* The Smallest Pyramid */
+                var secondPyramidGeo = new THREE.CylinderBufferGeometry( 0, 150, 150, 4 );
+                var secondPyramidMesh = new THREE.Mesh( secondPyramidGeo, material );
+                secondPyramidMesh.position.x += 280 ;
+                secondPyramidMesh.position.y -= 51 ;
+                secondPyramidMesh.position.z += 120;
+                secondPyramidMesh.castShadow = true;
+                secondPyramidMesh.receiveShadow = true; 
+                containerMesh.add( secondPyramidMesh );
+                /* The Middle Pyramid */
+                var thirdPyramidGeo = new THREE.CylinderBufferGeometry( 0, 180, 180, 4 );
+                var thirdPyramidMesh = new THREE.Mesh( thirdPyramidGeo, material );
+                thirdPyramidMesh.position.x -= 320 ;
+                thirdPyramidMesh.position.y -= 40 ;
+                thirdPyramidMesh.position.z -= 80;
+                thirdPyramidMesh.castShadow = true;
+                thirdPyramidMesh.receiveShadow = true; //default
+                containerMesh.add( thirdPyramidMesh );
+
+                // Options to be added to the GUI
+
+                var options = {
+                    'Reset Camera': function() {
+                        camera.position.set( -450, 30, 500);
+                        control = new THREE.OrbitControls( camera );
+                    },
+                    'Toggle Light': function() {
+                        lightToggle = lightToggle == 0 ? 1 : 0;
+                    }
+                };
+
+                // DAT.GUI Related Stuff
+
+                var gui = new dat.GUI();
+
+                //                var cam = gui.addFolder('Light');
+                //                cam.add(options.camera, 'speed', 0, 0.0010).listen();
+                //                cam.add(camera.position, 'y', 0, 100).listen();
+                //                cam.open();
+
+                gui.add(options, 'Reset Camera');
+                gui.add(options, 'Toggle Light');
+
+
+                //                
+                //                light = new THREE.DirectionalLight(0xffffff, 1.0);
+                //                light.castShadow = true;  // allows the light to cast shadows
+                //                light.shadow.camera.near = 1; // Note: It is VITAL to set the camera properties!
+                //                light.shadow.camera.far = 10000;
+                //                light.shadow.camera.left = -200;
+                //                light.shadow.camera.button = -250;
+                //                light.shadow.camera.right = 200;
+                //                light.shadow.camera.top = 400;
+                //                light.shadow.mapSize.width = 2048;
+                //                light.shadow.mapSize.height = 2048;
+                //                light.add( new THREE.Mesh(
+                //                    new THREE.SphereBufferGeometry( 50, 20 , 20 ),
+                //                    new THREE.MeshBasicMaterial({ color: 0xcccccc })
+                //                ));
+                //                light.position.set(650,650,350);
+                //                firstLight = new THREE.Object3D();
+                //                firstLight.add(light);
+                //                scene.add(firstLight);
+                //                light = new THREE.DirectionalLight(0xffffff, 1.0);
+                //                light.castShadow = true;  // allows the light to cast shadows
+                //                light.shadowDarkness = 0.8;
+                //                light.shadowCameraNear = 1; // Note: It is VITAL to set the camera properties!
+                //                light.shadowCameraFar = 10000;
+                //                light.shadowCameraLeft = -250;
+                //                light.shadowCameraBottom = -250;
+                //                light.shadowCameraRight = 200;
+                //                light.shadowCameraTop = 400;
+                //                light.shadowMapWidth = 2048;
+                //                light.shadowMapHeight = 2048;
+                //                light.add( new THREE.Mesh(
+                //                    new THREE.SphereBufferGeometry( 50, 20 , 20 ),
+                //                    new THREE.MeshBasicMaterial({ color: 0xcccccc })
+                //                ));
+                //                light.position.set(300,650,150);
+                //                firstLight = new THREE.Object3D();
+                //                firstLight.add(light);
+                //                scene.add(firstLight);
+
+
+                light2 = new THREE.PointLight( 0xffffff, 1, 10000 );
+                light2.castShadow = true;  // allows the light to cast shadows
+                light2.position.set( 300, -650, 350 );
+                scene.add( light2 );
+
+                light = new THREE.DirectionalLight(0xffffff, 1.0);
+                light.castShadow = true;  // allows the light to cast shadows
+                light.shadowDarkness = 0.8;
+                light.shadowCameraNear = 1; // Note: It is VITAL to set the camera properties!
+                light.shadowCameraFar = 10000;
+                light.shadowCameraLeft = -250;
+                light.shadowCameraBottom = -250;
+                light.shadowCameraRight = 200;
+                light.shadowCameraTop = 400;
+                light.shadowMapWidth = 2048;
+                light.shadowMapHeight = 2048;
+                //                light.add( new THREE.Mesh(
+                //                    new THREE.SphereBufferGeometry( 50, 20 , 20 ),
+                //                    new THREE.MeshBasicMaterial({ color: 0xcccccc })
+                //                ));
+                light.position.set(650,650,350);
+                firstLight = new THREE.Object3D();
+                firstLight.add(light);
+                scene.add(firstLight);
+
+
+                renderer = new THREE.WebGLRenderer();
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.shadowMapEnabled = true;
+                document.body.appendChild( renderer.domElement );
+
+            }
+            function animate() {
+                if (light2.intensity <= 1 && l == false)
+                {
+                    light2.intensity -= 0.004 * lightToggle;
+                    light.intensity -= 0.0043 * lightToggle;
+                    light.position.y += 2 * lightToggle;
+                    if (light2.intensity <= 0.36){ l = true; }
+                }
+                if (light2.intensity <= 1 && l == true)
+                {   
+                    light2.intensity += 0.004 * lightToggle;
+                    light.intensity += 0.0043 * lightToggle;
+                    light.position.y -= 2 * lightToggle;
+                    if (light2.intensity >= 1){ l = false; }
+                }
+                renderer.render( scene, camera );
+                requestAnimationFrame( animate );
+            }
+        </script>
+    </body>
+</html>
