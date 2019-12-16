@@ -86,7 +86,7 @@
                 document.getElementById("myModal").style.display = "none";
             };
 
-            var camera, control, scene, renderer, light ,light2;
+            var camera, control, scene, renderer, light ,light2 , light3;
             var lightBool = false; //boolean for 'toggle light'
             var lightVal = 0; //value for light change
             var loaded = false; //boolean for camel movement
@@ -268,10 +268,22 @@
                 containerMesh.add( light );
 
 
+                //adding the thrid light to simulate moon
+                light3 = new THREE.DirectionalLight(0xffffff, 0);
+//                light3.position.set(-400,870,-480);
+                light3.position.set(-450,-500,670);
+                light3.add( new THREE.Mesh(
+                    new THREE.SphereBufferGeometry( 50, 20 , 20 ),
+                    new THREE.MeshBasicMaterial({ color: 0xcccccc })
+                ));
+                containerMesh.add( light3 );
+
+
                 pivot = new THREE.Group();
                 pivot.position.set( 0.0, 0.0, 0 ); // MOVE THE PIVOT BACK TO WORLD ORIGN
                 containerMesh.add( pivot ); // THIS ADDS THE PIVOT TO THE CENTRE OF THE GEOMOETRY, WHICH WAS THEN ADDING MESH2 IN THE WRONG PLACE
                 pivot.add( light );
+                pivot.add( light3 );
 
                 //adding the second light to light up everything
                 light2 = new THREE.PointLight( 0xffffff, 1);
@@ -291,52 +303,57 @@
                 document.body.appendChild( renderer.domElement );
             }  
             function animate() {
-                //start the camel movement after loading and rotate after reaching a certain position
-                if (loaded == true) {
-                    if (scene.children[0].children[6].position.z <= 450 && scene.children[0].children[6].position.z >= 0) {
-                        scene.children[0].children[6].position.z += moveVal;
-                        scene.children[0].children[6].position.x += moveVal;
-                    }                 
-                    else if (scene.children[0].children[6].position.z >= 450) {
-                        moveVal = -moveVal;
-                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(225) ;
-                        scene.children[0].children[6].position.z += moveVal;
-                        scene.children[0].children[6].position.x += moveVal;
-                    }
-                    else {
-                        moveVal = -moveVal;
-                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(50) ;
-                        scene.children[0].children[6].position.z += moveVal;
-                        scene.children[0].children[6].position.x += moveVal;
-                    }
-                }
+                //                start the camel movement after loading and rotate after reaching a certain position
+//                if (loaded == true) {
+//                    if (scene.children[0].children[7].position.z <= 450 && scene.children[0].children[7].position.z >= 0) {
+//                        scene.children[0].children[7].position.z += moveVal;
+//                        scene.children[0].children[7].position.x += moveVal;
+//                    }                 
+//                    else if (scene.children[0].children[7].position.z >= 450) {
+//                        moveVal = -moveVal;
+//                        scene.children[0].children[7].rotation.y = THREE.Math.degToRad(225) ;
+//                        scene.children[0].children[7].position.z += moveVal;
+//                        scene.children[0].children[7].position.x += moveVal;
+//                    }
+//                    else {
+//                        moveVal = -moveVal;
+//                        scene.children[0].children[7].rotation.y = THREE.Math.degToRad(50) ;
+//                        scene.children[0].children[7].position.z += moveVal;
+//                        scene.children[0].children[7].position.x += moveVal;
+//                    }
+//                }
                 //making it night
                 if (lightBool == false) {
                     light2.intensity -= 0.0035 * lightVal;
                     light.intensity -= 0.003 * lightVal;
+                    light3.intensity += 0.0055 * lightVal;
+                    light3.position.y -= 1 * lightVal;
                     pivot.rotation.z += 0.008 * lightVal;
                     if (light2.intensity <= 0){ 
                         lightBool = true;
                         light2.intensity = -1.7;
                         light.intensity = -0.7;
+
                     }
                 }
                 //making it day
                 if (lightBool == true) {   
                     light2.intensity += 0.0055 * lightVal;
                     light.intensity += 0.003 * lightVal;
+                    light3.intensity -= 0.0035 * lightVal;
+                    light3.position.y += 0.9 * lightVal;
                     pivot.rotation.z += 0.008 * lightVal;
                     if (light2.intensity >= 1){ 
                         lightBool = false; 
                     }
                 }
-                
+
                 camera.layers.set(0);
                 renderer.render(scene, camera);
                 renderer.autoClear = false;
                 camera.layers.set(1);
                 renderer.render(scene, camera);
-                
+
                 requestAnimationFrame( animate );
             }
         </script>
