@@ -270,7 +270,7 @@
 
                 //adding the thrid light to simulate moon
                 light3 = new THREE.DirectionalLight(0xffffff, 0);
-//                light3.position.set(-400,870,-480);
+                //                light3.position.set(-400,870,-480);
                 light3.position.set(-450,-500,670);
                 light3.add( new THREE.Mesh(
                     new THREE.SphereBufferGeometry( 50, 20 , 20 ),
@@ -303,25 +303,25 @@
                 document.body.appendChild( renderer.domElement );
             }  
             function animate() {
-                //                start the camel movement after loading and rotate after reaching a certain position
-//                if (loaded == true) {
-//                    if (scene.children[0].children[7].position.z <= 450 && scene.children[0].children[7].position.z >= 0) {
-//                        scene.children[0].children[7].position.z += moveVal;
-//                        scene.children[0].children[7].position.x += moveVal;
-//                    }                 
-//                    else if (scene.children[0].children[7].position.z >= 450) {
-//                        moveVal = -moveVal;
-//                        scene.children[0].children[7].rotation.y = THREE.Math.degToRad(225) ;
-//                        scene.children[0].children[7].position.z += moveVal;
-//                        scene.children[0].children[7].position.x += moveVal;
-//                    }
-//                    else {
-//                        moveVal = -moveVal;
-//                        scene.children[0].children[7].rotation.y = THREE.Math.degToRad(50) ;
-//                        scene.children[0].children[7].position.z += moveVal;
-//                        scene.children[0].children[7].position.x += moveVal;
-//                    }
-//                }
+                //start the camel movement after loading and rotate after reaching a certain position
+                if (loaded == true) {
+                    if (scene.children[0].children[6].position.z <= 450 && scene.children[0].children[6].position.z >= 0) {
+                        scene.children[0].children[6].position.z += moveVal;
+                        scene.children[0].children[6].position.x += moveVal;
+                    }                 
+                    else if (scene.children[0].children[6].position.z >= 450) {
+                        moveVal = -moveVal;
+                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(225) ;
+                        scene.children[0].children[6].position.z += moveVal;
+                        scene.children[0].children[6].position.x += moveVal;
+                    }
+                    else {
+                        moveVal = -moveVal;
+                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(50) ;
+                        scene.children[0].children[6].position.z += moveVal;
+                        scene.children[0].children[6].position.x += moveVal;
+                    }
+                }
                 //making it night
                 if (lightBool == false) {
                     light2.intensity -= 0.0035 * lightVal;
