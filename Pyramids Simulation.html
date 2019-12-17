@@ -94,6 +94,7 @@
             var lightVal = 0; //value for light change
             var loaded = false; //boolean for camel movement
             var moveVal = 0.1; //value for camel movement
+            var cameldegree = 50; //value for camel rotation
             init();
             animate();
             function init() {
@@ -118,7 +119,6 @@
                 var sandtexture = new THREE.TextureLoader().load( 'textures/sand.jpg' );
                 var sandmaterial = new THREE.MeshPhongMaterial( { map: sandtexture } );
                 var planeMesh = new THREE.Mesh( planeGeo, sandmaterial );
-                sandmaterial.side = THREE.DoubleSide;
                 planeMesh.receiveShadow = true; 
                 planeMesh.position.y = -107;
                 containerMesh.add( planeMesh );
@@ -182,21 +182,21 @@
                 //adding sphinx
                 var sphinxtexture = textureLoader.load( 'textures/sphinx.jpg' );
                 var sphinxmaterial = new THREE.MeshPhongMaterial( { map: sphinxtexture } ); //phong to receive/cast shadows
-                objLoader.load('models/sphinx.obj',function(object){
-                    object.traverse(function(node){
-                        if (node.isMesh) {node.material=horsematerial};
+                objLoader.load('models/sphinx.obj',function(sp){
+                    sp.traverse(function(node){
+                        if (node.isMesh) {node.material=sphinxmaterial};
                         node.castShadow = true;
                         node.receiveShadow = true;
                     });                      
-                    object.position.x = -550 ;
-                    object.position.y = -110 ;
-                    object.position.z = -220 ;
-                    object.rotation.x = THREE.Math.degToRad(270);
-                    object.rotation.z =THREE.Math.degToRad(-45);
-                    object.scale.x = 0.055;
-                    object.scale.y = 0.055;
-                    object.scale.z = 0.055;
-                    containerMesh.add( object );
+                    sp.position.x = -550 ;
+                    sp.position.y = -110 ;
+                    sp.position.z = -220 ;
+                    sp.rotation.x = THREE.Math.degToRad(270);
+                    sp.rotation.z = THREE.Math.degToRad(-45);
+                    sp.scale.x = 0.055;
+                    sp.scale.y = 0.055;
+                    sp.scale.z = 0.055;
+                    containerMesh.add( sp );
                 });
 
                 //adding the moving camel
@@ -230,7 +230,7 @@
                     c2.position.x -= 380 ;
                     c2.position.y -= 107 ;
                     c2.position.z += 130;
-                    c2.rotation.y = THREE.Math.degToRad(50);
+                    c2.rotation.y = THREE.Math.degToRad(cameldegree);
                     c2.scale.x += 10;
                     c2.scale.y += 10;
                     c2.scale.z += 10;
@@ -270,18 +270,21 @@
                 light.position.set(670,670,670);
                 containerMesh.add( light );
 
+                //adding the second light to light up everything
+                light2 = new THREE.PointLight( 0xffffff, 1);
+                light2.castShadow = true;
+                light2.position.set( 0, -900, 0 );
+                containerMesh.add( light2 );
 
                 //adding the thrid light to simulate moon
                 light3 = new THREE.DirectionalLight(0xffffff, 0);
-                //                light3.position.set(-400,870,-480);
                 light3.position.set(-450,-500,670);
                 light3.add( new THREE.Mesh(
                     new THREE.SphereBufferGeometry( 50, 20 , 20 ),
                     new THREE.MeshBasicMaterial({ color: 0xcccccc })
                 ));
                 containerMesh.add( light3 );
-                
-                
+
                 //creating a pivot
                 pivot = new THREE.Group();
                 //moving the pivot back to world origin
@@ -290,13 +293,6 @@
                 containerMesh.add( pivot );
                 pivot.add( light );
                 pivot.add( light3 );
-
-                //adding the second light to light up everything
-                light2 = new THREE.PointLight( 0xffffff, 1);
-                light2.castShadow = true;
-                light2.position.set( 0, -900, 0 );
-                containerMesh.add( light2 );
-
 
                 light2.layers.set(1);
                 containerMesh.layers.set(1);
@@ -311,35 +307,25 @@
             function animate() {
                 //start the camel movement after loading and rotate after reaching a certain position
                 if (loaded == true) {
-                    if (scene.children[0].children[6].position.z <= 450 && scene.children[0].children[6].position.z >= 0) {
-                        scene.children[0].children[6].position.z += moveVal;
-                        scene.children[0].children[6].position.x += moveVal;
-                    }                 
-                    else if (scene.children[0].children[6].position.z >= 450) {
+                    if (scene.children[0].children[6].position.z >= 450 || scene.children[0].children[6].position.z <= 0) {
+                        cameldegree+=180;
                         moveVal = -moveVal;
-                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(225) ;
-                        scene.children[0].children[6].position.z += moveVal;
-                        scene.children[0].children[6].position.x += moveVal;
-                    }
-                    else {
-                        moveVal = -moveVal;
-                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(50) ;
-                        scene.children[0].children[6].position.z += moveVal;
-                        scene.children[0].children[6].position.x += moveVal;
-                    }
+                        scene.children[0].children[6].rotation.y = THREE.Math.degToRad(cameldegree) ;
+
+                    }   
+                    scene.children[0].children[6].position.z += moveVal;
+                    scene.children[0].children[6].position.x += moveVal;
                 }
                 //making it night
                 if (lightBool == false) {
                     light2.intensity -= 0.0035 * lightVal;
                     light.intensity -= 0.003 * lightVal;
                     light3.intensity += 0.0055 * lightVal;
-                    light3.position.y -= 1 * lightVal;
                     pivot.rotation.z += 0.008 * lightVal;
                     if (light2.intensity <= 0){ 
                         lightBool = true;
                         light2.intensity = -1.7;
                         light.intensity = -0.7;
-
                     }
                 }
                 //making it day
@@ -347,7 +333,6 @@
                     light2.intensity += 0.0055 * lightVal;
                     light.intensity += 0.003 * lightVal;
                     light3.intensity -= 0.0035 * lightVal;
-                    light3.position.y += 0.9 * lightVal;
                     pivot.rotation.z += 0.008 * lightVal;
                     if (light2.intensity >= 1){ 
                         lightBool = false; 
