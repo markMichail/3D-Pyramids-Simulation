@@ -171,12 +171,8 @@
                 gui.add(options, 'Reset Camera');
                 gui.add(options, 'Toggle Light');
 
-                //adding manager to run functions when scene is fully loaded
-                var manager = new THREE.LoadingManager();
-                manager.onLoad = function(){ loaded = true; }
-
                 //adding the objects and textures loaders
-                var textureLoader = new THREE.TextureLoader( manager );
+                var textureLoader = new THREE.TextureLoader();
                 var objLoader = new THREE.OBJLoader();
 
                 //adding sphinx
@@ -207,6 +203,7 @@
                         if (node.isMesh) {node.material=camelmaterial};
                         node.castShadow = true;
                         node.receiveShadow = true;
+                        loaded = true; 
                     });
                     c1.position.x += 180 ;
                     c1.position.y -= 105 ;
